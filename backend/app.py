@@ -5,12 +5,20 @@ import os
 from rag.extractor import load_pdf_documents
 from rag.chunker import split_documents
 from rag.vectorstore import create_vector_store
+from rag.retriever import retrieve_documents
+from rag.rag_chain import generate_answer
+
+from pydantic import BaseModel
 
 app = FastAPI()
 
 UPLOAD_DIR = "uploads"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+class SearchRequest(BaseModel):
+    query: str
 
 
 @app.get("/")
@@ -44,10 +52,10 @@ async def upload_pdf(file: UploadFile = File(...)):
         # we deleted the embedding file because FAISS automatically creates the embeddings, we dont have to do it again manually
 
         # 3. Create FAISS vector store
-        vector_store = create_vector_store(
+        create_vector_store(
             chunked_documents
         )
-
+        os.remove(file_path)
 
         return {
             "filename": file.filename,
@@ -56,9 +64,45 @@ async def upload_pdf(file: UploadFile = File(...)):
             "vector_store_created": True,
             "faiss_index_location": "faiss_index/"
         }
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
 
+@app.post("/search")
+def search_documents(request: SearchRequest):
+    try:
+        results = retrieve_documents(request.query)
+
+        return {
+            "query": request.query,
+            "results": [
+                {
+                    "content":doc.page_content,
+                    "score":float(score)
+                }
+                for doc, score in results
+                    
+            ]
+        }
     except Exception as e:
 
         return {
             "error": str(e)
         }
+@app.post("/ask")
+def ask_question(request: SearchRequest):
+
+    try:
+
+        answer = generate_answer(
+            request.query
+        )
+
+        return {
+            "question": request.query,
+            "answer": answer
+        }
+        
+    except Exception as e:
+        return {"error": str(e)}

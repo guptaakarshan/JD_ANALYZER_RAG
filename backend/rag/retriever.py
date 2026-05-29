@@ -24,9 +24,11 @@ def retrieve_documents(query, k=5):
 
     vector_store = load_vector_store()
 
-    results = vector_store.similarity_search(
+    results = vector_store.similarity_search_with_score(
         query,
         k=k
     )
+    for doc, score in results:
+      print(score)
 
     return results
