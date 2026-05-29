@@ -1,16 +1,17 @@
-from fastapi import FastAPI,UploadFile, File
+from fastapi import FastAPI, UploadFile, File
 import shutil
 import os
 
 from rag.extractor import load_pdf_documents
 from rag.chunker import split_documents
-from rag.embeddings import create_embeddings
+from rag.vectorstore import create_vector_store
 
 app = FastAPI()
 
-UPLOAD_DIR="uploads"
+UPLOAD_DIR = "uploads"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 
 @app.get("/")
 def home():
@@ -18,36 +19,46 @@ def home():
         "message": "JD Analyzer Backend Running"
     }
 
-@app.post("/upload")
 
+@app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
-    
+
     if not file.filename.endswith(".pdf"):
         return {
             "error": "Only PDF files are allowed"
         }
-    
-    file_path=f"{UPLOAD_DIR}/{file.filename}"
-    
+
+    file_path = f"{UPLOAD_DIR}/{file.filename}"
+
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-        
+
     try:
+
+        # 1. Load PDF
         documents = load_pdf_documents(file_path)
-        
+
+        # 2. Split into chunks
         chunked_documents = split_documents(documents)
         
-        embeddings=create_embeddings(chunked_documents)
-        
+        # we deleted the embedding file because FAISS automatically creates the embeddings, we dont have to do it again manually
+
+        # 3. Create FAISS vector store
+        vector_store = create_vector_store(
+            chunked_documents
+        )
+
+
         return {
-        "filename": file.filename,
-        "total_original_pages": len(documents),
-        "total_chunks": len(chunked_documents),
-        "total_embeddings": len(embeddings),
-        "embedding_dimensions": len(embeddings[0]),
-    }
-        
+            "filename": file.filename,
+            "total_pages": len(documents),
+            "total_chunks": len(chunked_documents),
+            "vector_store_created": True,
+            "faiss_index_location": "faiss_index/"
+        }
+
     except Exception as e:
+
         return {
             "error": str(e)
         }
