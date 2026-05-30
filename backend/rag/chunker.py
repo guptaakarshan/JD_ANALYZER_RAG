@@ -9,3 +9,4 @@ def split_documents(documents):
   
   chunked_documents=text_splitter.split_documents(documents)
   return chunked_documents
+ 

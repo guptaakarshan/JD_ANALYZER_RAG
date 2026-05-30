@@ -7,8 +7,8 @@ from rag.chunker import split_documents
 from rag.vectorstore import create_vector_store
 from rag.retriever import retrieve_documents
 from rag.rag_chain import generate_answer
-
 from pydantic import BaseModel
+from langchain_core.documents import Document
 
 app = FastAPI()
 
@@ -20,6 +20,9 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 class SearchRequest(BaseModel):
     query: str
 
+class JDRequest(BaseModel):
+    job_description: str
+
 
 @app.get("/")
 def home():
@@ -28,7 +31,7 @@ def home():
     }
 
 
-@app.post("/upload")
+@app.post("/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...)):
 
     if not file.filename.endswith(".pdf"):
@@ -49,12 +52,26 @@ async def upload_pdf(file: UploadFile = File(...)):
         # 2. Split into chunks
         chunked_documents = split_documents(documents)
         
+        
+        print("\n========== PDF CHUNKS ==========\n")
+
+        for i, chunk in enumerate(chunked_documents):
+
+            print(f"\n------ CHUNK {i+1} ------")
+            print(f"Length: {len(chunk.page_content)}")
+            print(chunk.page_content)
+
+        print("\n===============================\n")
+        
+        
         # we deleted the embedding file because FAISS automatically creates the embeddings, we dont have to do it again manually
 
         # 3. Create FAISS vector store
         create_vector_store(
-            chunked_documents
+            chunked_documents,
+            "resume_faiss_index"
         )
+        
         os.remove(file_path)
 
         return {
@@ -68,11 +85,53 @@ async def upload_pdf(file: UploadFile = File(...)):
         return {
             "error": str(e)
         }
+        
+        
+@app.post("/upload-jd")
+
+def upload_jd(request: JDRequest):
+    
+    try:
+        
+        documents=[
+            Document(
+                page_content=request.job_description
+            )
+        ]
+        
+        chunked_documents=split_documents(documents)
+        
+        print("\n========== JD CHUNKS ==========\n")
+
+        for i, chunk in enumerate(chunked_documents):
+
+            print(f"\n------ CHUNK {i+1} ------")
+            print(f"Length: {len(chunk.page_content)}")
+            print(chunk.page_content)
+
+        print("\n===============================\n")
+        
+        create_vector_store(
+            chunked_documents,
+            "jd_faiss_index"
+        )
+        
+        return{
+            "message":"Job Description Uploaded",
+            "total_chunks":len(chunked_documents)
+        }
+    except Exception as e:
+            return {
+                "error": str(e)
+            }
 
 @app.post("/search")
 def search_documents(request: SearchRequest):
     try:
-        results = retrieve_documents(request.query)
+        results = retrieve_documents(
+            request.query,
+            "resume_faiss_index"
+        )
 
         return {
             "query": request.query,
@@ -90,6 +149,25 @@ def search_documents(request: SearchRequest):
         return {
             "error": str(e)
         }
+        
+@app.post("/search-jd")
+def search_jd(request: SearchRequest):
+
+    results = retrieve_documents(
+        request.query,
+        "jd_faiss_index"
+    )
+
+    return {
+        "results": [
+            {
+                "content": doc.page_content,
+                "score": float(score)
+            }
+            for doc, score in results
+        ]
+    }
+    
 @app.post("/ask")
 def ask_question(request: SearchRequest):
 

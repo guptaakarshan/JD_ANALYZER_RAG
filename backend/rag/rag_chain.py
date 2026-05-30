@@ -2,19 +2,30 @@ from rag.retriever import retrieve_documents
 from rag.llm import llm
 
 from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
 prompt_template = PromptTemplate(
-    input_variables=["context", "question"],
+    input_variables=["resume_context", "jd_context", "question"],
     template="""
-You are an expert resume analyzer.
+You are an expert Resume and Job Description Analyzer.
 
-Use ONLY the provided context to answer the question.
+Your task is to answer the user's question strictly using the provided Resume Context and Job Description Context.
 
-If the answer is not present in the context, respond with:
-"I could not find that information in the resume."
+Instructions:
+- Answer only from the provided context.
+- Do not use outside knowledge.
+- Keep answers concise and relevant.
+- Use bullet points when listing skills, qualifications, responsibilities, or requirements.
+- If the answer requires comparison, provide a clear comparison.
+- If the information is not available in the context, respond exactly with:
+  "I could not find that information."
+- Do not speculate or infer information that is not explicitly stated.
 
-Context:
-{context}
+Resume Context:
+{resume_context}
+
+Job Description Context:
+{jd_context}
 
 Question:
 {question}
@@ -23,19 +34,41 @@ Answer:
 """
 )
 
+chain = (
+  prompt_template | llm | StrOutputParser()
+)
+
 def generate_answer(query):
 
-    documents = retrieve_documents(query)
+    resume_docs = retrieve_documents(
+    query,
+    "resume_faiss_index"
+)
 
-    context = "\n\n".join(
-        [doc.page_content for doc, score in documents]
+    jd_docs = retrieve_documents(
+    query,
+    "jd_faiss_index"
+)
+
+    resume_context = "\n\n".join(
+        [doc.page_content for doc, score in resume_docs]
     )
-
-    final_prompt = prompt_template.format(
-        context=context,
-        question=query
+    
+    jd_context = "\n\n".join(
+        [doc.page_content for doc, score in jd_docs]
     )
+    
+    
+    print("\n===== RESUME CONTEXT =====\n")
+    print(resume_context)
 
-    response = llm.invoke(final_prompt)
+    print("\n===== JD CONTEXT =====\n")
+    print(jd_context)
 
-    return response.content
+    response = chain.invoke({
+        "resume_context": resume_context,
+        "jd_context": jd_context,
+        "question": query
+    })
+
+    return response
