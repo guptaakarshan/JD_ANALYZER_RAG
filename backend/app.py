@@ -53,15 +53,14 @@ async def upload_pdf(file: UploadFile = File(...)):
         chunked_documents = split_documents(documents)
         
         
-        print("\n========== PDF CHUNKS ==========\n")
+       # print("\n========== PDF CHUNKS ==========\n")
 
-        for i, chunk in enumerate(chunked_documents):
+        #for i, chunk in enumerate(chunked_documents):
 
-            print(f"\n------ CHUNK {i+1} ------")
-            print(f"Length: {len(chunk.page_content)}")
-            print(chunk.page_content)
+         # print(f"Length: {len(chunk.page_content)}")
+           # print(chunk.page_content)
 
-        print("\n===============================\n")
+        #print("\n===============================\n")
         
         
         # we deleted the embedding file because FAISS automatically creates the embeddings, we dont have to do it again manually
@@ -79,7 +78,7 @@ async def upload_pdf(file: UploadFile = File(...)):
             "total_pages": len(documents),
             "total_chunks": len(chunked_documents),
             "vector_store_created": True,
-            "faiss_index_location": "faiss_index/"
+            "faiss_index_location": "resume_faiss_index/"
         }
     except Exception as e:
         return {
@@ -101,15 +100,15 @@ def upload_jd(request: JDRequest):
         
         chunked_documents=split_documents(documents)
         
-        print("\n========== JD CHUNKS ==========\n")
+       # print("\n========== JD CHUNKS ==========\n")
 
-        for i, chunk in enumerate(chunked_documents):
+        #for i, chunk in enumerate(chunked_documents):
 
-            print(f"\n------ CHUNK {i+1} ------")
-            print(f"Length: {len(chunk.page_content)}")
-            print(chunk.page_content)
+          #  print(f"\n------ CHUNK {i+1} ------")
+           # print(f"Length: {len(chunk.page_content)}")
+            #print(chunk.page_content)
 
-        print("\n===============================\n")
+        #print("\n===============================\n")
         
         create_vector_store(
             chunked_documents,
