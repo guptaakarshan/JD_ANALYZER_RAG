@@ -130,7 +130,7 @@ backend/
 ### 1. Clone Repository
 
 ```bash
-git clone <your-repository-url>
+git clone <https://github.com/guptaakarshan/JD_ANALYZER_RAG.git>
 cd JD-analyzer_RAG
 ```
 
