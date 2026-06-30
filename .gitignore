@@ -5,3 +5,4 @@ uploads/
 backend/resume_faiss_index/
 backend/jd_faiss_index/
 *.pyc
+backend/testenv/
