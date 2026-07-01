@@ -21,7 +21,7 @@ app.add_middleware(
     "http://localhost:5174",
     "http://127.0.0.1:5174",
     "https://jd-analyzer-rag.vercel.app",
-    "https://jd-analyzer.akarshan.dev/"
+    "https://jd-analyzer.akarshan.dev"
 ],
     allow_credentials=True,
     allow_methods=["*"],
