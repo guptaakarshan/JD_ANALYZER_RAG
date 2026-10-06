@@ -77,7 +77,7 @@ async def upload_pdf(
         documents = load_pdf_documents(file_path)
 
         # 2. Split into chunks
-        chunked_documents = split_documents(documents)
+        chunked_documents = split_documents(documents, document_type="resume")
 
         # 3. Create FAISS vector store
         create_vector_store(
@@ -112,11 +112,12 @@ def upload_jd(request: JDRequest):
         
         documents = [
             Document(
-                page_content=request.job_description
+                page_content=request.job_description,
+                metadata={"source": "job_description", "page": 0}
             )
         ]
         
-        chunked_documents = split_documents(documents)
+        chunked_documents = split_documents(documents, document_type="jd")
         
         create_vector_store(
             chunked_documents,

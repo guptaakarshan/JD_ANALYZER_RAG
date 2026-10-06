@@ -9,16 +9,18 @@ SECTION_CHUNK_SIZE = 700
 SECTION_CHUNK_OVERLAP = 100
 
 RESUME_HEADINGS = {
-  "skills": re.compile(r"^(?:technical\s+)?skills(?:\s*(?:and|&)\s*technologies)?\s*:?[\s|\-]*$", re.IGNORECASE),
-  "experience": re.compile(r"^(?:(?:work|professional|relevant)\s+)?experience\s*:?[\s|\-]*$", re.IGNORECASE),
-  "education": re.compile(r"^(?:education|academic\s+background)\s*:?[\s|\-]*$", re.IGNORECASE),
-  "projects": re.compile(r"^(?:projects?|personal\s+projects?)\s*:?[\s|\-]*$", re.IGNORECASE),
+  "skills": re.compile(r"^(?:(?:technical|core|key)\s+)?skills(?:\s*(?:and|&)\s*technologies)?\s*:?[\s|\-]*$", re.IGNORECASE),
+  "experience": re.compile(r"^(?:(?:work|professional|relevant|employment)\s+)?(?:experience|history)\s*:?[\s|\-]*$", re.IGNORECASE),
+  "education": re.compile(r"^(?:education|academic\s+(?:background|history)|educational\s+background)\s*:?[\s|\-]*$", re.IGNORECASE),
+  "projects": re.compile(r"^(?:(?:personal|academic|key)\s+)?projects?\s*:?[\s|\-]*$", re.IGNORECASE),
 }
 
 JD_HEADINGS = {
-  "responsibilities": re.compile(r"^(?:(?:key\s+)?responsibilities|what\s+you(?:'|’)ll\s+do|what\s+you\s+will\s+do)\s*:?[\s|\-]*$", re.IGNORECASE),
-  "requirements": re.compile(r"^(?:requirements|qualifications|what\s+you(?:'|’)ll\s+bring)\s*:?[\s|\-]*$", re.IGNORECASE),
-  "skills": re.compile(r"^(?:required|preferred)?\s*skills\s*:?[\s|\-]*$", re.IGNORECASE),
+  "responsibilities": re.compile(r"^(?:(?:key|core|role)?\s*responsibilities|roles?\s+and\s+responsibilities|duties)\s*:?[\s|\-]*$", re.IGNORECASE),
+  "requirements": re.compile(r"^(?:(?:key|minimum|basic|role)?\s*requirements?)\s*:?[\s|\-]*$", re.IGNORECASE),
+  "qualifications": re.compile(r"^(?:(?:minimum|basic|preferred)?\s*qualifications?)\s*:?[\s|\-]*$", re.IGNORECASE),
+  "skills": re.compile(r"^(?:(?:required|preferred|technical|core)\s+)?skills(?:\s*(?:and|&)\s*technologies)?\s*:?[\s|\-]*$", re.IGNORECASE),
+  "what you will do": re.compile(r"^(?:what\s+you(?:'|’)?ll\s+(?:do|be\s+doing)|what\s+you\s+will\s+(?:do|be\s+doing)|what\s+you(?:'|’)?ll\s+bring)\s*:?[\s|\-]*$", re.IGNORECASE),
 }
 
 
@@ -69,14 +71,16 @@ def _split_by_sections(documents, headings):
       )
 
   detected_sections = [
-    document for document in sectioned_documents
-    if document.metadata.get("section") != "general"
+    doc for doc in sectioned_documents
+    if doc.metadata.get("section") and doc.metadata.get("section") != "general"
   ]
   return sectioned_documents if detected_sections else []
 
 
 def _match_heading(line, headings):
-  normalized_line = re.sub(r"\s+", " ", line.strip())
+  cleaned = re.sub(r"^[#*\-\s]+", "", line.strip())
+  cleaned = re.sub(r"[*:\s]+$", "", cleaned).strip()
+  normalized_line = re.sub(r"\s+", " ", cleaned)
   for heading, pattern in headings.items():
     if pattern.match(normalized_line):
       return heading
@@ -85,7 +89,8 @@ def _match_heading(line, headings):
 
 def _section_document(document, section, lines):
   metadata = dict(document.metadata)
-  metadata["section"] = section
+  if section != "general":
+    metadata["section"] = section
   return Document(
     page_content="\n".join(lines).strip(),
     metadata=metadata,

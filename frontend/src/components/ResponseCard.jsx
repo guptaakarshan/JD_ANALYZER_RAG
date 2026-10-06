@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ChevronDown, FileText, MessageCircle } from 'lucide-react';
+import { ChevronDown, BookOpen, MessageCircle } from 'lucide-react';
 import SkeletonLoader from './SkeletonLoader';
 
 function cleanAnswerText(text) {
@@ -11,58 +11,89 @@ function cleanAnswerText(text) {
     .trim();
 }
 
-export default function ResponseCard({ isLoading, qaLog, hasAnalyzed }) {
+export default function ResponseCard({ isLoading, qaLog }) {
   const bottomRef = useRef(null);
-  const [closedEvidence, setClosedEvidence] = useState({});
+  const [openEvidence, setOpenEvidence] = useState({});
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [qaLog, isLoading]);
 
+  const toggleEvidence = (idx) =>
+    setOpenEvidence((prev) => ({ ...prev, [idx]: !prev[idx] }));
+
   return (
-    <section className="insight-section">
-      <div className="section-heading"><div><p className="eyebrow">AI insight</p><h2>{qaLog.length ? 'Your answers' : 'Ask AI anything about your match.'}</h2></div><MessageCircle size={19} /></div>
-      {!qaLog.length && !isLoading && <div className="compact-empty">{hasAnalyzed ? 'Ask a question above to get personalized insights about your match.' : 'Your results and answers will appear here.'}</div>}
+    <section className="insights-section animate-fade-up" style={{ animationDelay: '0.2s' }}>
+      <div className="insights-header">
+        <span className="insights-title">AI Insights</span>
+        {qaLog.length > 0 && (
+          <span className="insights-count">{qaLog.length} answer{qaLog.length !== 1 ? 's' : ''}</span>
+        )}
+      </div>
+
+      {!qaLog.length && !isLoading && (
+        <div className="insights-empty">
+          <div className="insights-empty-icon">
+            <MessageCircle size={20} />
+          </div>
+          Upload your resume, add a job description, then ask anything above.
+        </div>
+      )}
+
       {isLoading && !qaLog.length && <SkeletonLoader />}
-      {qaLog.length > 0 && <div className="answer-list">
-        {qaLog.map((entry, index) => {
-          const isClosed = Boolean(closedEvidence[index]);
-          return (
-            <article className="answer-entry" key={`${entry.question}-${index}`}>
-              <p className="asked-label">You asked</p>
-              <p className="asked-question">“{entry.question}”</p>
-              <div className="answer-copy">{cleanAnswerText(entry.answer)}</div>
-              {entry.sources?.length > 0 && <div className="evidence-block">
-                <button
-                  className="evidence-toggle"
-                  onClick={() => setClosedEvidence((prev) => ({ ...prev, [index]: !prev[index] }))}
-                  aria-label="Toggle evidence details"
-                >
-                  <span><FileText size={14} /> Evidence ({entry.sources.length})</span>
-                  <ChevronDown size={15} className={isClosed ? '' : 'rotate-180'} />
-                </button>
-                {!isClosed && (
-                  <div className="evidence-list">
-                    {entry.sources.map((source, sIdx) => {
-                      const typeLabel = source.document_type === 'resume' ? 'Resume' : 'Job Description';
-                      const pageLabel = source.page ? ` · Page ${source.page}` : '';
-                      return (
-                        <div className="evidence-item" key={source.label || sIdx}>
-                          <strong>Evidence</strong>
-                          <span>{typeLabel}{pageLabel}</span>
-                          <p>“{source.snippet}”</p>
-                        </div>
-                      );
-                    })}
+
+      {qaLog.length > 0 && (
+        <div className="answer-list">
+          {qaLog.map((entry, idx) => {
+            const isOpen = Boolean(openEvidence[idx]);
+            return (
+              <article className="answer-item animate-fade-in" key={`${entry.question}-${idx}`}>
+                <p className="q-label">You asked</p>
+                <p className="q-text">"{entry.question}"</p>
+                <div className="a-text">{cleanAnswerText(entry.answer)}</div>
+
+                {entry.sources?.length > 0 && (
+                  <div>
+                    <button
+                      className="evidence-toggle-btn"
+                      onClick={() => toggleEvidence(idx)}
+                      aria-expanded={isOpen}
+                    >
+                      <BookOpen size={13} />
+                      {isOpen ? 'Hide' : 'Show'} sources ({entry.sources.length})
+                      <ChevronDown
+                        size={13}
+                        style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+                      />
+                    </button>
+
+                    {isOpen && (
+                      <div className="evidence-list">
+                        {entry.sources.map((src, sIdx) => {
+                          const typeLabel = src.document_type === 'resume' ? 'Resume' : 'Job Description';
+                          const meta = [
+                            src.page ? `Page ${src.page}` : null,
+                            src.section ? src.section.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : null,
+                          ].filter(Boolean).join(' · ');
+                          return (
+                            <div className="evidence-card" key={src.label || sIdx}>
+                              <div className="ev-type">{typeLabel}</div>
+                              {meta && <div className="ev-meta">{meta}</div>}
+                              <div className="ev-snippet">"{src.snippet}"</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>}
-            </article>
-          );
-        })}
-        {isLoading && <SkeletonLoader />}
-        <div ref={bottomRef} />
-      </div>}
+              </article>
+            );
+          })}
+          {isLoading && <SkeletonLoader />}
+          <div ref={bottomRef} />
+        </div>
+      )}
     </section>
   );
 }

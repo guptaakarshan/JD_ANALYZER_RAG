@@ -51,14 +51,17 @@ def _format_context(docs, doc_type, default_filename):
         filename = Path(raw_source).name if raw_source else default_filename
         page = metadata.get("page")
         page_num = page + 1 if isinstance(page, int) else (1 if doc_type == "jd" else None)
+        section = metadata.get("section")
         snippet = doc.page_content.strip()
 
-        context_parts.append(f"[{label}]\n{snippet}")
+        section_tag = f" ({section.title()})" if section else ""
+        context_parts.append(f"[{label}]{section_tag}\n{snippet}")
         sources.append({
             "label": label,
             "document_type": doc_type,
             "filename": filename,
             "page": page_num,
+            "section": section,
             "score": round(float(score), 4),
             "snippet": snippet[:300] + ("..." if len(snippet) > 300 else ""),
         })

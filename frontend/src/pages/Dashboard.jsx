@@ -6,29 +6,46 @@ import AskAISection from '../components/AskAISection';
 import ResponseCard from '../components/ResponseCard';
 import toast from 'react-hot-toast';
 import { askQuestion, getErrorMessage } from '../services/api';
+import { Zap, FileText, BrainCircuit, MessageSquare } from 'lucide-react';
+
+// Progress step indicator
+function StepsStrip({ resumeReady, jdReady }) {
+  const steps = [
+    { label: 'Resume', done: resumeReady, icon: FileText },
+    { label: 'Job Description', done: jdReady, icon: BrainCircuit },
+    { label: 'Ask AI', done: false, active: resumeReady && jdReady, icon: MessageSquare },
+  ];
+
+  return (
+    <div className="steps-strip">
+      {steps.map((step, i) => (
+        <React.Fragment key={step.label}>
+          <div className={`step-node${step.done ? ' done' : step.active ? ' active' : ''}`}>
+            <div className="step-dot">
+              {step.done ? '✓' : i + 1}
+            </div>
+            {step.label}
+          </div>
+          {i < steps.length - 1 && <div className="step-connector" />}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
 
 export default function Dashboard() {
   const [sessionId, setSessionId] = useState(null);
-  // Track what has been indexed on the backend
-  const [uploadedFileName, setUploadedFileName] = useState(null); // null = not uploaded
+  const [uploadedFileName, setUploadedFileName] = useState(null);
   const [isJdSaved, setIsJdSaved] = useState(false);
-
-  // Q&A state
   const [qaLog, setQaLog] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Both must be ready before Ask AI is useful
   const isReady = uploadedFileName && isJdSaved;
 
   const handleResumeSuccess = (data) => {
-    if (!data) {
-      setUploadedFileName(null);
-      return;
-    }
+    if (!data) { setUploadedFileName(null); return; }
     setUploadedFileName(data.filename);
-    if (data.sessionId) {
-      setSessionId(data.sessionId);
-    }
+    if (data.sessionId) setSessionId(data.sessionId);
   };
 
   const handleJdSuccess = (result) => {
@@ -36,21 +53,20 @@ export default function Dashboard() {
       setIsJdSaved(result);
     } else {
       setIsJdSaved(true);
-      if (result) {
-        setSessionId(result);
-      }
+      if (result) setSessionId(result);
     }
   };
 
+  const handleNewAnalysis = () => {
+    setSessionId(null);
+    setUploadedFileName(null);
+    setIsJdSaved(false);
+    setQaLog([]);
+  };
+
   const handleAsk = async (question) => {
-    if (!uploadedFileName) {
-      toast.error('Please upload a resume first.');
-      return;
-    }
-    if (!isJdSaved) {
-      toast.error('Please save a job description first.');
-      return;
-    }
+    if (!uploadedFileName) { toast.error('Upload a resume first.'); return; }
+    if (!isJdSaved) { toast.error('Save a job description first.'); return; }
 
     setIsLoading(true);
     try {
@@ -72,10 +88,24 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F4F5] flex flex-col">
-      <Navbar />
+    <div className="app-shell">
+      <Navbar onNewAnalysis={handleNewAnalysis} />
 
-      <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-6">
+      <main className="app-main">
+        {/* Hero */}
+        <div className="hero">
+          <div className="hero-badge">
+            <Zap size={11} strokeWidth={3} />
+            AI-powered match analysis
+          </div>
+          <h1>Know exactly how well<br />you fit the role</h1>
+          <p>Upload your resume, paste the job description, and get instant AI insights on your fit, strengths, and gaps.</p>
+        </div>
+
+        {/* Step progress */}
+        <StepsStrip resumeReady={!!uploadedFileName} jdReady={isJdSaved} />
+
+        {/* Upload cards */}
         <ResumeUploadCard
           onUploadSuccess={handleResumeSuccess}
           uploadedFileName={uploadedFileName}
@@ -88,24 +118,26 @@ export default function Dashboard() {
           sessionId={sessionId}
         />
 
-        {/* Readiness hint */}
+        {/* Gate hint */}
         {!isReady && (
-          <p className="text-xs text-gray-400 text-center">
+          <div className="ready-gate animate-fade-in">
             {!uploadedFileName && !isJdSaved
-              ? 'Upload a resume and save a job description to enable Q&A.'
+              ? 'Complete both steps above to start asking questions.'
               : !uploadedFileName
-                ? 'Upload a resume to enable Q&A.'
-                : 'Save a job description to enable Q&A.'}
-          </p>
+                ? 'Upload your resume to continue.'
+                : 'Save a job description to continue.'}
+          </div>
         )}
 
-        <AskAISection onAsk={handleAsk} isLoading={isLoading} />
+        {/* Ask AI */}
+        <AskAISection onAsk={handleAsk} isLoading={isLoading} disabled={!isReady} />
 
+        {/* AI responses */}
         <ResponseCard qaLog={qaLog} isLoading={isLoading} />
       </main>
 
-      <footer className="py-6 text-center text-xs text-gray-400 border-t border-gray-200 bg-white">
-        © {new Date().getFullYear()} JD Analyzer. Built for smarter recruitment.
+      <footer className="app-footer">
+        © {new Date().getFullYear()} MatchAI · Built for smarter job search
       </footer>
     </div>
   );

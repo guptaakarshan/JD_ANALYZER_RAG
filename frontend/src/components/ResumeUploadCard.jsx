@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { UploadCloud, FileText, X, CheckCircle2 } from 'lucide-react';
+import { UploadCloud, FileText, X, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadPdf, getErrorMessage } from '../services/api';
 
@@ -35,12 +35,13 @@ export default function ResumeUploadCard({ onUploadSuccess, uploadedFileName, se
   const handleUpload = async () => {
     if (!selectedFile) return;
     setIsUploading(true);
-    const tid = toast.loading('Uploading resume…');
+    const tid = toast.loading('Indexing resume…');
     try {
       const result = await uploadPdf(selectedFile, sessionId);
       toast.dismiss(tid);
-      toast.success('Resume uploaded successfully.');
+      toast.success('Resume ready!');
       onUploadSuccess({ filename: selectedFile.name, sessionId: result.session_id });
+      setSelectedFile(null);
     } catch (err) {
       toast.dismiss(tid);
       toast.error(getErrorMessage(err));
@@ -55,101 +56,87 @@ export default function ResumeUploadCard({ onUploadSuccess, uploadedFileName, se
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  const formatSize = (bytes) => bytes < 1024 * 1024
+    ? `${(bytes / 1024).toFixed(0)} KB`
+    : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+
   return (
-    <section className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 p-6">
-      <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">
-        1. Upload Resume (PDF)
-      </p>
+    <section className="card animate-fade-up" style={{ animationDelay: '0.05s' }}>
+      <div className="card-label">
+        <span className="card-label-dot" />
+        Step 1 — Your Resume
+      </div>
 
       <input
         ref={fileInputRef}
         type="file"
         accept=".pdf"
-        className="hidden"
+        style={{ display: 'none' }}
         onChange={handleFileChange}
       />
 
-      {/* Already successfully uploaded */}
+      {/* Already uploaded */}
       {uploadedFileName && !selectedFile && (
-        <div className="rounded-xl border border-green-100 bg-green-50/50 px-4 py-3.5 flex items-center gap-3 animate-fadeIn">
-          <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
-          <p className="text-sm font-medium text-green-800 truncate flex-1">{uploadedFileName}</p>
-          <button
-            onClick={() => onUploadSuccess(null)}
-            className="text-green-500 hover:text-green-700 transition-colors shrink-0 p-1 hover:bg-green-100 rounded-full"
-            aria-label="Clear upload"
-          >
-            <X className="h-4 w-4" />
+        <div className="file-chip animate-fade-in" style={{ marginBottom: 0 }}>
+          <div className="file-chip-icon success">
+            <CheckCircle size={18} />
+          </div>
+          <div className="file-chip-body">
+            <div className="file-chip-name">{uploadedFileName}</div>
+            <div className="file-chip-meta">Indexed and ready</div>
+          </div>
+          <button className="file-chip-remove" onClick={() => onUploadSuccess(null)} aria-label="Clear">
+            <X size={15} />
           </button>
         </div>
       )}
 
-      {/* File selected but not yet uploaded */}
+      {/* File selected, not yet uploaded */}
       {selectedFile && (
-        <div className="rounded-xl border border-gray-100 bg-gray-50/50 px-4 py-3.5 flex items-center justify-between gap-3 mb-4 animate-fadeIn">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="bg-gray-100 rounded-lg p-2 shrink-0">
-              <FileText className="h-5 w-5 text-gray-500" strokeWidth={1.5} />
+        <>
+          <div className="file-chip animate-fade-in" style={{ marginBottom: 12 }}>
+            <div className="file-chip-icon pending">
+              <FileText size={18} />
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-gray-800 truncate">{selectedFile.name}</p>
-              <p className="text-xs text-gray-400">{(selectedFile.size / (1024 * 1024)).toFixed(2)} MB</p>
+            <div className="file-chip-body">
+              <div className="file-chip-name">{selectedFile.name}</div>
+              <div className="file-chip-meta">{formatSize(selectedFile.size)} · PDF</div>
             </div>
+            {!isUploading && (
+              <button className="file-chip-remove" onClick={handleRemove} aria-label="Remove">
+                <X size={15} />
+              </button>
+            )}
           </div>
-          {!isUploading && (
-            <button
-              onClick={handleRemove}
-              className="text-gray-400 hover:text-gray-600 shrink-0 transition-colors p-1 hover:bg-gray-200 rounded-full"
-              aria-label="Remove file"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
+          <button className="btn-primary" onClick={handleUpload} disabled={isUploading}>
+            {isUploading ? (
+              <>
+                <span className="spinner" />
+                Indexing…
+              </>
+            ) : 'Upload Resume'}
+          </button>
+        </>
       )}
 
-      {/* Drop zone — only shown when no file is staged and nothing has been uploaded */}
+      {/* Drop zone */}
       {!selectedFile && !uploadedFileName && (
         <div
+          className={`drop-zone${isDragActive ? ' drag-active' : ''}`}
           onDragEnter={handleDrag}
           onDragOver={handleDrag}
           onDragLeave={handleDrag}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current.click()}
-          className={`cursor-pointer rounded-xl border-2 border-dashed py-12 flex flex-col items-center justify-center gap-4 transition-all duration-300 select-none ${isDragActive
-              ? 'border-black bg-gray-50/50 scale-[1.01]'
-              : 'border-gray-200 hover:border-gray-400 hover:bg-gray-50/50'
-            }`}
         >
-          <div className="bg-gray-50 rounded-full p-3 transition-colors duration-300">
-            <UploadCloud className="h-8 w-8 text-gray-400" strokeWidth={1.5} />
+          <div className="drop-zone-icon">
+            <UploadCloud size={22} strokeWidth={1.5} />
           </div>
-          <div className="text-center">
-            <p className="text-sm font-medium text-gray-700">Click to upload or drag &amp; drop</p>
-            <p className="text-xs text-gray-400 mt-1">PDF only • Max 10 MB</p>
+          <div>
+            <p className="drop-title">Drop your resume here or click to browse</p>
+            <p className="drop-sub">PDF only · Max 10 MB</p>
           </div>
         </div>
-      )}
-
-      {/* Upload button */}
-      {selectedFile && (
-        <button
-          onClick={handleUpload}
-          disabled={isUploading}
-          className="w-full bg-black hover:bg-zinc-800 disabled:opacity-50 text-white text-sm font-medium py-3 rounded-lg transition-all duration-200 active:scale-[0.99] flex items-center justify-center gap-2 shadow-sm hover:shadow-md cursor-pointer disabled:cursor-not-allowed"
-        >
-          {isUploading ? (
-            <>
-              <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z" />
-              </svg>
-              Uploading…
-            </>
-          ) : (
-            'Upload Resume'
-          )}
-        </button>
       )}
     </section>
   );

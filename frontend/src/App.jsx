@@ -12,14 +12,14 @@ function App() {
           style: {
             fontFamily: 'Inter, sans-serif',
             fontSize: '13px',
-            background: '#fff',
-            color: '#111827',
-            border: '1px solid #E5E7EB',
+            background: '#1a1a1f',
+            color: '#fafafa',
+            border: '1px solid rgba(255,255,255,0.08)',
             borderRadius: '10px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
           },
-          success: { iconTheme: { primary: '#16a34a', secondary: '#fff' } },
-          error:   { iconTheme: { primary: '#dc2626', secondary: '#fff' } },
+          success: { iconTheme: { primary: '#22c55e', secondary: '#1a1a1f' } },
+          error:   { iconTheme: { primary: '#ef4444', secondary: '#1a1a1f' } },
         }}
       />
     </>
