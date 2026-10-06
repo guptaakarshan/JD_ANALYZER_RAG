@@ -4,7 +4,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
 const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 60000,
+  timeout: 60000, // 60 s — embedding + LLM calls can be slow
 });
 
 /**
@@ -31,18 +31,19 @@ export function getErrorMessage(err) {
 /**
  * POST /upload-pdf
  * Sends the PDF as multipart/form-data.
- * Returns the uploaded resume details and session identifier.
+ * Returns: { session_id, filename, total_pages, total_chunks, vector_store_created, faiss_index_location }
  */
-export async function uploadPdf(file, sessionId, onUploadProgress) {
+export async function uploadPdf(file, sessionId) {
   const form = new FormData();
   form.append('file', file);
   if (sessionId) form.append('session_id', sessionId);
 
   const { data } = await api.post('/upload-pdf', form, {
     headers: { 'Content-Type': 'multipart/form-data' },
-    onUploadProgress,
+    params: sessionId ? { session_id: sessionId } : {},
   });
 
+  // Backend returns { error } even on 200 when something goes wrong
   if (data?.error) throw new Error(data.error);
   return data;
 }
@@ -50,10 +51,13 @@ export async function uploadPdf(file, sessionId, onUploadProgress) {
 /**
  * POST /upload-jd
  * Body: { job_description: string, session_id?: string }
- * Returns: { message, total_chunks }
+ * Returns: { session_id, message, total_chunks }
  */
 export async function uploadJd(jobDescription, sessionId) {
-  const { data } = await api.post('/upload-jd', { job_description: jobDescription, session_id: sessionId });
+  const { data } = await api.post('/upload-jd', {
+    job_description: jobDescription,
+    session_id: sessionId,
+  });
 
   if (data?.error) throw new Error(data.error);
   return data;
@@ -65,8 +69,11 @@ export async function uploadJd(jobDescription, sessionId) {
  * Returns: { question, answer }
  */
 export async function askQuestion(query, sessionId) {
-  const { data } = await api.post('/ask', { query, session_id: sessionId });
+  const { data } = await api.post('/ask', {
+    query,
+    session_id: sessionId,
+  });
 
   if (data?.error) throw new Error(data.error);
-  return data;
+  return data; // { question, answer }
 }

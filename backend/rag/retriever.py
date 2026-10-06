@@ -6,14 +6,13 @@ import os
 
 load_dotenv()
 
-# Embedding model used during retrieval
-embedding_model = OpenAIEmbeddings(
-    model="text-embedding-3-small"
+from rag.vectorstore import (
+    embedding_model,
+    FAISS_DISTANCE_STRATEGY,
+    NORMALIZE_EMBEDDINGS,
 )
+import os
 
-# Match vector creation: normalized inner product is cosine similarity.
-FAISS_DISTANCE_STRATEGY = DistanceStrategy.MAX_INNER_PRODUCT
-NORMALIZE_EMBEDDINGS = True
 MIN_COSINE_SIMILARITY = float(os.getenv("RETRIEVAL_MIN_COSINE_SIMILARITY", "0.35"))
 
 
@@ -51,3 +50,34 @@ def retrieve_documents(
         for document, score in results
         if float(score) >= min_score
     ]
+
+
+def retrieve_documents_with_stats(
+    query,
+    index_path,
+    k=3,
+    min_score=MIN_COSINE_SIMILARITY,
+):
+    vector_store = load_vector_store(
+        index_path
+    )
+
+    results = vector_store.similarity_search_with_score(
+        query=query,
+        k=k
+    )
+
+    accepted = [
+        (document, float(score))
+        for document, score in results
+        if float(score) >= min_score
+    ]
+    total_retrieved = len(results)
+    rejected = total_retrieved - len(accepted)
+
+    return accepted, {
+        "retrieved": total_retrieved,
+        "accepted": len(accepted),
+        "rejected": rejected,
+        "threshold": min_score,
+    }

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { CheckCircle2, BriefcaseBusiness } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadJd, getErrorMessage } from '../services/api';
 
 export default function JobDescriptionCard({ onSaveSuccess, isSaved, sessionId }) {
-  const [jdText, setJdText]       = useState('');
-  const [isSaving, setIsSaving]   = useState(false);
+  const [jdText, setJdText] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const maxLength = 5000;
 
   const handleChange = (e) => {
@@ -23,15 +23,7 @@ export default function JobDescriptionCard({ onSaveSuccess, isSaved, sessionId }
       const result = await uploadJd(jdText, sessionId);
       toast.dismiss(tid);
       toast.success('Job description saved successfully.');
-      onSaveSuccess({
-        session_id: result.session_id,
-        saved: true,
-        summary: {
-          ...result,
-          words: jdText.trim().split(/\s+/).length,
-        },
-        skill_insights: result.skill_insights,
-      });
+      onSaveSuccess(result.session_id);
     } catch (err) {
       toast.dismiss(tid);
       toast.error(getErrorMessage(err));
@@ -43,14 +35,21 @@ export default function JobDescriptionCard({ onSaveSuccess, isSaved, sessionId }
   // When user edits after saving, mark as unsaved
   const handleTextChange = (e) => {
     handleChange(e);
-    if (isSaved) onSaveSuccess({ session_id: sessionId, saved: false });
+    if (isSaved) onSaveSuccess(false);
   };
 
   return (
-    <section className="upload-card">
-      <div className="upload-card-heading">
-        <div><p className="eyebrow">This job</p><h2>Paste the job description</h2></div>
-        <BriefcaseBusiness size={19} />
+    <section className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 p-6">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+          2. Job Description
+        </p>
+        {isSaved && (
+          <span className="flex items-center gap-1.5 text-xs font-medium text-green-700 bg-green-50 px-2 py-1 rounded-md animate-fadeIn">
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            Saved
+          </span>
+        )}
       </div>
 
       <textarea
@@ -62,7 +61,7 @@ export default function JobDescriptionCard({ onSaveSuccess, isSaved, sessionId }
       />
 
       <div className="mt-3 flex items-center justify-between">
-        <p className="text-xs text-gray-400">{jdText.trim() ? 'Ready to compare' : 'Add the role details to continue'}</p>
+        <p className="text-xs text-gray-400">{jdText.length} / {maxLength} characters</p>
 
         {jdText.trim() && (
           <button
@@ -78,7 +77,7 @@ export default function JobDescriptionCard({ onSaveSuccess, isSaved, sessionId }
                 </svg>
                 Saving…
               </>
-            ) : isSaved ? 'Saved ✓' : 'Save job description'}
+            ) : isSaved ? 'Saved ✓' : 'Save Job Description'}
           </button>
         )}
       </div>

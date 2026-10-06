@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { askQuestion, getErrorMessage } from '../services/api';
 
 export default function Dashboard() {
+  const [sessionId, setSessionId] = useState(null);
   // Track what has been indexed on the backend
   const [uploadedFileName, setUploadedFileName] = useState(null); // null = not uploaded
   const [isJdSaved, setIsJdSaved] = useState(false);
@@ -18,6 +19,28 @@ export default function Dashboard() {
 
   // Both must be ready before Ask AI is useful
   const isReady = uploadedFileName && isJdSaved;
+
+  const handleResumeSuccess = (data) => {
+    if (!data) {
+      setUploadedFileName(null);
+      return;
+    }
+    setUploadedFileName(data.filename);
+    if (data.sessionId) {
+      setSessionId(data.sessionId);
+    }
+  };
+
+  const handleJdSuccess = (result) => {
+    if (typeof result === 'boolean') {
+      setIsJdSaved(result);
+    } else {
+      setIsJdSaved(true);
+      if (result) {
+        setSessionId(result);
+      }
+    }
+  };
 
   const handleAsk = async (question) => {
     if (!uploadedFileName) {
@@ -31,8 +54,16 @@ export default function Dashboard() {
 
     setIsLoading(true);
     try {
-      const data = await askQuestion(question);
-      setQaLog((prev) => [...prev, { question, answer: data.answer }]);
+      const data = await askQuestion(question, sessionId);
+      setQaLog((prev) => [
+        ...prev,
+        {
+          question,
+          answer: data.answer,
+          sources: data.sources || [],
+          retrieval_stats: data.retrieval_stats || null,
+        },
+      ]);
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {
@@ -46,13 +77,15 @@ export default function Dashboard() {
 
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-6">
         <ResumeUploadCard
-          onUploadSuccess={setUploadedFileName}
+          onUploadSuccess={handleResumeSuccess}
           uploadedFileName={uploadedFileName}
+          sessionId={sessionId}
         />
 
         <JobDescriptionCard
-          onSaveSuccess={setIsJdSaved}
+          onSaveSuccess={handleJdSuccess}
           isSaved={isJdSaved}
+          sessionId={sessionId}
         />
 
         {/* Readiness hint */}
