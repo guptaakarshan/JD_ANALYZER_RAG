@@ -3,10 +3,11 @@ import { UploadCloud, FileText, X, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadPdf, getErrorMessage } from '../services/api';
 
-export default function ResumeUploadCard({ onUploadSuccess, uploadedFileName }) {
+export default function ResumeUploadCard({ onUploadSuccess, uploadedFileName, sessionId }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragActive, setIsDragActive]  = useState(false);
   const [isUploading, setIsUploading]    = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
 
   const accept = (file) => {
@@ -37,29 +38,35 @@ export default function ResumeUploadCard({ onUploadSuccess, uploadedFileName }) 
     setIsUploading(true);
     const tid = toast.loading('Uploading resume…');
     try {
-      const result = await uploadPdf(selectedFile);
+      const result = await uploadPdf(selectedFile, sessionId, (event) => {
+        if (event.total) setUploadProgress(Math.round((event.loaded / event.total) * 100));
+      });
       toast.dismiss(tid);
       toast.success('Resume uploaded successfully.');
-      onUploadSuccess(selectedFile.name);
+      onUploadSuccess({
+        filename: result.filename,
+        session_id: result.session_id,
+        summary: result,
+        skill_insights: result.skill_insights,
+      });
     } catch (err) {
       toast.dismiss(tid);
       toast.error(getErrorMessage(err));
     } finally {
       setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
   const handleRemove = () => {
     setSelectedFile(null);
-    onUploadSuccess(null);
+    onUploadSuccess({ filename: null, session_id: null });
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   return (
-    <section className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 p-6">
-      <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">
-        1. Upload Resume (PDF)
-      </p>
+    <section className="upload-card">
+      <div className="upload-card-heading"><div><p className="eyebrow">Your resume</p><h2>Upload your PDF resume</h2></div><FileText size={19} /></div>
 
       <input
         ref={fileInputRef}
@@ -74,8 +81,9 @@ export default function ResumeUploadCard({ onUploadSuccess, uploadedFileName }) 
         <div className="rounded-xl border border-green-100 bg-green-50/50 px-4 py-3.5 flex items-center gap-3 animate-fadeIn">
           <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
           <p className="text-sm font-medium text-green-800 truncate flex-1">{uploadedFileName}</p>
+          <span className="upload-ready">Uploaded</span>
           <button
-            onClick={() => onUploadSuccess(null)}
+            onClick={() => onUploadSuccess({ filename: null, session_id: null })}
             className="text-green-500 hover:text-green-700 transition-colors shrink-0 p-1 hover:bg-green-100 rounded-full"
             aria-label="Clear upload"
           >
@@ -108,6 +116,13 @@ export default function ResumeUploadCard({ onUploadSuccess, uploadedFileName }) 
         </div>
       )}
 
+      {isUploading && (
+        <div className="upload-progress" aria-live="polite">
+          <div className="upload-progress-label"><span>Uploading resume</span><strong>{uploadProgress}%</strong></div>
+          <div className="upload-progress-track"><span style={{ width: `${Math.max(uploadProgress, 4)}%` }} /></div>
+        </div>
+      )}
+
       {/* Drop zone — only shown when no file is staged and nothing has been uploaded */}
       {!selectedFile && !uploadedFileName && (
         <div
@@ -127,7 +142,7 @@ export default function ResumeUploadCard({ onUploadSuccess, uploadedFileName }) 
           </div>
           <div className="text-center">
             <p className="text-sm font-medium text-gray-700">Click to upload or drag &amp; drop</p>
-            <p className="text-xs text-gray-400 mt-1">PDF only • Max 10 MB</p>
+            <p className="text-xs text-gray-400 mt-1">PDF format · drag and drop supported</p>
           </div>
         </div>
       )}
@@ -148,7 +163,7 @@ export default function ResumeUploadCard({ onUploadSuccess, uploadedFileName }) 
               Uploading…
             </>
           ) : (
-            'Upload Resume'
+            'Upload resume'
           )}
         </button>
       )}

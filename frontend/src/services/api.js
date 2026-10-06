@@ -4,7 +4,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
 const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 60000, // 60 s — embedding + LLM calls can be slow
+  timeout: 60000,
 });
 
 /**
@@ -31,28 +31,29 @@ export function getErrorMessage(err) {
 /**
  * POST /upload-pdf
  * Sends the PDF as multipart/form-data.
- * Returns: { filename, total_pages, total_chunks, vector_store_created, faiss_index_location }
+ * Returns the uploaded resume details and session identifier.
  */
-export async function uploadPdf(file) {
+export async function uploadPdf(file, sessionId, onUploadProgress) {
   const form = new FormData();
   form.append('file', file);
+  if (sessionId) form.append('session_id', sessionId);
 
   const { data } = await api.post('/upload-pdf', form, {
     headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress,
   });
 
-  // Backend returns { error } even on 200 when something goes wrong
   if (data?.error) throw new Error(data.error);
   return data;
 }
 
 /**
  * POST /upload-jd
- * Body: { job_description: string }
+ * Body: { job_description: string, session_id?: string }
  * Returns: { message, total_chunks }
  */
-export async function uploadJd(jobDescription) {
-  const { data } = await api.post('/upload-jd', { job_description: jobDescription });
+export async function uploadJd(jobDescription, sessionId) {
+  const { data } = await api.post('/upload-jd', { job_description: jobDescription, session_id: sessionId });
 
   if (data?.error) throw new Error(data.error);
   return data;
@@ -60,12 +61,12 @@ export async function uploadJd(jobDescription) {
 
 /**
  * POST /ask
- * Body: { query: string }
+ * Body: { query: string, session_id: string }
  * Returns: { question, answer }
  */
-export async function askQuestion(query) {
-  const { data } = await api.post('/ask', { query });
+export async function askQuestion(query, sessionId) {
+  const { data } = await api.post('/ask', { query, session_id: sessionId });
 
   if (data?.error) throw new Error(data.error);
-  return data; // { question, answer }
+  return data;
 }

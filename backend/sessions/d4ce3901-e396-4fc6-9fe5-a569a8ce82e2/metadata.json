@@ -1,0 +1,21 @@
+{
+  "session_id": "d4ce3901-e396-4fc6-9fe5-a569a8ce82e2",
+  "jd_index_path": "C:\\Users\\KIIT0001\\Desktop\\projects\\JD-analyzer_RAG\\backend\\sessions\\d4ce3901-e396-4fc6-9fe5-a569a8ce82e2\\jd_faiss_index",
+  "resume_index_path": "C:\\Users\\KIIT0001\\Desktop\\projects\\JD-analyzer_RAG\\backend\\sessions\\d4ce3901-e396-4fc6-9fe5-a569a8ce82e2\\resume_faiss_index",
+  "metadata_path": "C:\\Users\\KIIT0001\\Desktop\\projects\\JD-analyzer_RAG\\backend\\sessions\\d4ce3901-e396-4fc6-9fe5-a569a8ce82e2\\metadata.json",
+  "jd_skills": [
+    "Python",
+    "Java",
+    "JavaScript",
+    "TypeScript",
+    "React",
+    "Node.js",
+    "MySQL",
+    "MongoDB",
+    "Redis",
+    "AWS",
+    "Docker",
+    "Git"
+  ],
+  "jd_text": "Software Development Engineer \u2014 Full Stack\nCompany: TechNova Solutions\nLocation: Bengaluru, India\nExperience: 0\u20132 years\nEmployment: Full-time\nAbout the Role\nWe are looking for a motivated Software Development Engineer to join our engineering team. The ideal candidate should have a strong foundation in software development and experience building web applications using modern frontend and backend technologies.\nResponsibilities\n- Develop and maintain scalable web applications.\n- Build responsive user interfaces using React.js.\n- Develop RESTful APIs using Node.js and Express.js.\n- Design and work with databases such as MongoDB and MySQL.\n- Write clean, maintainable, and reusable code.\n- Debug and troubleshoot application issues.\n- Collaborate with frontend, backend, and product teams in an Agile/Scrum environment.\n- Participate in code reviews and contribute to technical discussions.\n- Write unit and integration tests for applications.\n- Deploy applications using cloud platforms such as AWS.\nRequired Qualifications\n- Bachelor's degree in Computer Science, Information Technology, or a related field.\n- Strong knowledge of JavaScript.\n- Hands-on experience with React.js.\n- Experience with Node.js and Express.js.\n- Knowledge of MongoDB or MySQL.\n- Understanding of REST APIs.\n- Knowledge of Git and GitHub.\n- Good understanding of Data Structures and Algorithms.\n- Strong problem-solving and debugging skills.\nPreferred Skills\n- Experience with TypeScript.\n- Familiarity with Python or Java.\n- Knowledge of Docker and containerization.\n- Familiarity with AWS services such as EC2, S3, and Lambda.\n- Experience with CI/CD pipelines.\n- Knowledge of Redis or other caching technologies.\n- Familiarity with automated testing frameworks such as Jest or Cypress.\nExperience\n- 0\u20132 years of software development experience.\n- Internship or significant academic/project experience in full-stack development will be considered.\nWhat We Offer\n- Opportunity to work on production-scale applications.\n- Exposure to cloud technologies and modern development practices.\n- Collaborative and learning-oriented engineering environment.\n- Opportunities for professional growth."
+}

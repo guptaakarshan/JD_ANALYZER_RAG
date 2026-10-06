@@ -10,10 +10,10 @@ import { askQuestion, getErrorMessage } from '../services/api';
 export default function Dashboard() {
   // Track what has been indexed on the backend
   const [uploadedFileName, setUploadedFileName] = useState(null); // null = not uploaded
-  const [isJdSaved, setIsJdSaved]               = useState(false);
+  const [isJdSaved, setIsJdSaved] = useState(false);
 
   // Q&A state
-  const [qaLog, setQaLog]       = useState([]);
+  const [qaLog, setQaLog] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // Both must be ready before Ask AI is useful
@@ -61,8 +61,8 @@ export default function Dashboard() {
             {!uploadedFileName && !isJdSaved
               ? 'Upload a resume and save a job description to enable Q&A.'
               : !uploadedFileName
-              ? 'Upload a resume to enable Q&A.'
-              : 'Save a job description to enable Q&A.'}
+                ? 'Upload a resume to enable Q&A.'
+                : 'Save a job description to enable Q&A.'}
           </p>
         )}
 

@@ -1,0 +1,40 @@
+{
+  "session_id": "ecba2040-b4e1-49bc-bba6-70c64a767723",
+  "resume_filename": "Akarshan_Gupta_Resume.pdf",
+  "resume_index_path": "C:\\Users\\KIIT0001\\Desktop\\projects\\JD-analyzer_RAG\\backend\\sessions\\ecba2040-b4e1-49bc-bba6-70c64a767723\\resume_faiss_index",
+  "jd_index_path": "C:\\Users\\KIIT0001\\Desktop\\projects\\JD-analyzer_RAG\\backend\\sessions\\ecba2040-b4e1-49bc-bba6-70c64a767723\\jd_faiss_index",
+  "metadata_path": "C:\\Users\\KIIT0001\\Desktop\\projects\\JD-analyzer_RAG\\backend\\sessions\\ecba2040-b4e1-49bc-bba6-70c64a767723\\metadata.json",
+  "resume_skills": [
+    "Python",
+    "JavaScript",
+    "React",
+    "Node.js",
+    "FastAPI",
+    "MySQL",
+    "MongoDB",
+    "AWS",
+    "Git",
+    "REST API",
+    "LangChain",
+    "FAISS",
+    "OpenAI",
+    "HTML",
+    "CSS",
+    "C++",
+    "Excel"
+  ],
+  "jd_skills": [
+    "Python",
+    "Java",
+    "JavaScript",
+    "TypeScript",
+    "React",
+    "Node.js",
+    "MySQL",
+    "MongoDB",
+    "Redis",
+    "AWS",
+    "Docker",
+    "Git"
+  ]
+}

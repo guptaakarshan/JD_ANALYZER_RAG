@@ -1,0 +1,42 @@
+{
+  "session_id": "0e0395b1-3457-47fd-90d3-3fa22c009a3d",
+  "resume_filename": "Akarshan_Gupta_Resume.pdf",
+  "resume_index_path": "C:\\Users\\KIIT0001\\Desktop\\projects\\JD-analyzer_RAG\\backend\\sessions\\0e0395b1-3457-47fd-90d3-3fa22c009a3d\\resume_faiss_index",
+  "jd_index_path": "C:\\Users\\KIIT0001\\Desktop\\projects\\JD-analyzer_RAG\\backend\\sessions\\0e0395b1-3457-47fd-90d3-3fa22c009a3d\\jd_faiss_index",
+  "metadata_path": "C:\\Users\\KIIT0001\\Desktop\\projects\\JD-analyzer_RAG\\backend\\sessions\\0e0395b1-3457-47fd-90d3-3fa22c009a3d\\metadata.json",
+  "resume_skills": [
+    "Python",
+    "JavaScript",
+    "React",
+    "Node.js",
+    "FastAPI",
+    "MySQL",
+    "MongoDB",
+    "AWS",
+    "Git",
+    "REST API",
+    "LangChain",
+    "FAISS",
+    "OpenAI",
+    "HTML",
+    "CSS",
+    "C++",
+    "Excel"
+  ],
+  "resume_text": "Akarshan Gupta \n+91 9025676895 | akarshang31@gmail.com \nGithub | LinkedIn | LeetCode | Codolio \nSUMMARY \nFull-stack software developer with hands-on experience across the MERN stack, REST API design, and backend systems. Practical \nexperience building GenAI/RAG-powered applications using LangChain, FAISS, and LLM -based retrieval pipelines. Strong CS \nfundamentals in data structures, OOP, and database design. \nPROJECTS \nMulti-Document RAG JD Analyzer | LIVE DEMO | GITHUB FastAPI, LangChain, OpenAI Embeddings, FAISS \n\u2022 Engineered a multi-document RAG pipeline (FastAPI, LangChain, OpenAI Embeddings, FAISS), evaluated across 10\u201315 \nresumes and job descriptions for semantic search and context-aware question answering. \n\u2022 Optimized chunking, embedding generation, and FAISS vector retrieval to return context-relevant answers within a 1\u20133 \nsecond response time per query. \n\u2022 Designed prompt-engineered LLM response generation over retrieved context, exposed through FastAPI REST endpoints for \nscalable document processing. \nCollab-Docs \u2014 Real-Time Collaborative Document Editor | LIVE DEMO | GITHUB MERN, Yjs, Socket.IO, JWT \n\u2022 Developed a real-time collaborative document editor (MERN, Yjs CRDTs) enabling conflict -free simultaneous editing, \nachieving near-real-time sync latency under 200ms, validated with 2+ concurrent users editing the same document \nin live use. \n\u2022 Architected a hybrid real-time layer combining Yjs (WebSockets) for document synchronization with Socket.IO for presence \nindicators, live events, and dashboard updates. \n\u2022 Implemented JWT-authenticated, role-based access control (Owner/Editor) with bcrypt password hashing to secure \ndocument access. \nEXPERIENCE \nFull Stack Developer Intern \u2014 Code X Tech June 2026 \u2013 July 2026 \n\u2022 Engineered a Team Management module for an esports tournament platform (MERN stack) with full CRUD \nfunctionality, managing 100+ teams of up to 6 players each including a designated manager per team. \n\u2022 Built Excel/CSV import and export workflows using XLSX with data validation, automated roster generation, and \nmanager/substitute logic, processing team rosters of 4\u20136 players each in bulk and cutting estimated manual data-\nentry effort by 70\u201390%. \n\u2022 Implemented frontend and backend validation to maintain data integrity through unique UID management, role-based roster \nrules, and synchronization between imported and manually created records.  \n\u2022 Delivered new features into a shared development branch through Git/GitHub feature branches, pull requests, and \ncode reviews, keeping the codebase stable during active team development  \n \nEDUCATION  \nKalinga Institute of Industrial Technology \u2014 B.Tech, Computer Science and Engineering \nCGPA: 8.81 \n2023 \u2013 2027 \nDelhi Public School, Civil Lines \u2014 Intermediate \nScore: 90.4% \nLitera Valley Zee School \u2014 High School \nScore: 88.33% \n2021 \u2013 2022 \n \n                          2019 \u2013 2020 \nTECHNICAL SKILLS  \nLanguages: Python, JavaScript, C++, C, HTML, CSS \nFrameworks & Libraries: React.js, Node.js, Express.js, Socket.IO, LangChain, FastAPI \nDatabases: MongoDB, MySQL \nCloud & DevOps: AWS (EC2, S3, Lambda, IAM \u2013 basics), Git, GitHub \nAI/ML: RAG pipelines, OpenAI Embeddings, FAISS, LangChain \n \nCore CS: Data Structures & Algorithms, OOP, DBMS, Computer Networks  \nACHIEVEMENTS & CERTIFICATIONS  \n\u2022 3rd Place, Ignithon Hackathon \u2014 organized by KIIT University \n\u2022 2nd Place, Cipher Quest Hackathon \u2014 organized by KIIT University \n\u2022 Certifications: Cisco \u2013 Introduction to Data Science (May 2026); Deloitte Australia \u2013 Data Analytics Job Simulation (May 2025)",
+  "jd_skills": [
+    "Python",
+    "Java",
+    "JavaScript",
+    "TypeScript",
+    "React",
+    "Node.js",
+    "MySQL",
+    "MongoDB",
+    "Redis",
+    "AWS",
+    "Docker",
+    "Git"
+  ],
+  "jd_text": "Software Development Engineer \u2014 Full Stack\nCompany: TechNova Solutions\nLocation: Bengaluru, India\nExperience: 0\u20132 years\nEmployment: Full-time\nAbout the Role\nWe are looking for a motivated Software Development Engineer to join our engineering team. The ideal candidate should have a strong foundation in software development and experience building web applications using modern frontend and backend technologies.\nResponsibilities\n- Develop and maintain scalable web applications.\n- Build responsive user interfaces using React.js.\n- Develop RESTful APIs using Node.js and Express.js.\n- Design and work with databases such as MongoDB and MySQL.\n- Write clean, maintainable, and reusable code.\n- Debug and troubleshoot application issues.\n- Collaborate with frontend, backend, and product teams in an Agile/Scrum environment.\n- Participate in code reviews and contribute to technical discussions.\n- Write unit and integration tests for applications.\n- Deploy applications using cloud platforms such as AWS.\nRequired Qualifications\n- Bachelor's degree in Computer Science, Information Technology, or a related field.\n- Strong knowledge of JavaScript.\n- Hands-on experience with React.js.\n- Experience with Node.js and Express.js.\n- Knowledge of MongoDB or MySQL.\n- Understanding of REST APIs.\n- Knowledge of Git and GitHub.\n- Good understanding of Data Structures and Algorithms.\n- Strong problem-solving and debugging skills.\nPreferred Skills\n- Experience with TypeScript.\n- Familiarity with Python or Java.\n- Knowledge of Docker and containerization.\n- Familiarity with AWS services such as EC2, S3, and Lambda.\n- Experience with CI/CD pipelines.\n- Knowledge of Redis or other caching technologies.\n- Familiarity with automated testing frameworks such as Jest or Cypress.\nExperience\n- 0\u20132 years of software development experience.\n- Internship or significant academic/project experience in full-stack development will be considered.\nWhat We Offer\n- Opportunity to work on production-scale applications.\n- Exposure to cloud technologies and modern development practices.\n- Collaborative and learning-oriented engineering environment.\n- Opportunities for professional growth."
+}

@@ -2,16 +2,22 @@ from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import shutil
 import os
+from uuid import uuid4
+from pathlib import Path
 
 from rag.extractor import load_pdf_documents
 from rag.chunker import split_documents
 from rag.vectorstore import create_vector_store
 from rag.retriever import retrieve_documents
 from rag.rag_chain import generate_answer
+from rag.session_store import get_session_paths, read_metadata, write_metadata
+from rag.skill_matcher import analyze_candidate_fit, extract_skills
 from pydantic import BaseModel
 from langchain_core.documents import Document
 
 app = FastAPI()
+
+BASE_DIR = Path(__file__).resolve().parent
 
 app.add_middleware(
     CORSMiddleware,
@@ -35,9 +41,11 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 class SearchRequest(BaseModel):
     query: str
+    session_id: str | None = None
 
 class JDRequest(BaseModel):
     job_description: str
+    session_id: str | None = None
 
 
 @app.get("/")
@@ -48,53 +56,61 @@ def home():
 
 
 @app.post("/upload-pdf")
-async def upload_pdf(file: UploadFile = File(...)):
+async def upload_pdf(file: UploadFile = File(...), session_id: str | None = None):
 
     if not file.filename.endswith(".pdf"):
         return {
             "error": "Only PDF files are allowed"
         }
 
-    file_path = f"{UPLOAD_DIR}/{file.filename}"
+    session_id = session_id or str(uuid4())
+    resume_index_path, jd_index_path, metadata_path = get_session_paths(session_id, base_dir=BASE_DIR)
+    session_dir = resume_index_path.parent
+    session_dir.mkdir(parents=True, exist_ok=True)
+
+    file_path = session_dir / file.filename
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
     try:
+        documents = load_pdf_documents(str(file_path))
+        chunked_documents = split_documents(documents, document_type="resume")
+        resume_text = "\n".join(document.page_content for document in documents)
+        resume_skills = extract_skills(resume_text)
+        existing_metadata = read_metadata(session_id, base_dir=BASE_DIR)
+        jd_skills = existing_metadata.get("jd_skills", [])
+        jd_text = existing_metadata.get("jd_text", "")
 
-        # 1. Load PDF
-        documents = load_pdf_documents(file_path)
-
-        # 2. Split into chunks
-        chunked_documents = split_documents(documents)
-        
-        
-       # print("\n========== PDF CHUNKS ==========\n")
-
-        #for i, chunk in enumerate(chunked_documents):
-
-         # print(f"Length: {len(chunk.page_content)}")
-           # print(chunk.page_content)
-
-        #print("\n===============================\n")
-        
-        
-        # we deleted the embedding file because FAISS automatically creates the embeddings, we dont have to do it again manually
-
-        # 3. Create FAISS vector store
         create_vector_store(
             chunked_documents,
-            "resume_faiss_index"
+            str(resume_index_path)
         )
-        
+
+        write_metadata(
+            session_id,
+            {
+                "session_id": session_id,
+                "resume_filename": file.filename,
+                "resume_index_path": str(resume_index_path),
+                "jd_index_path": str(jd_index_path),
+                "metadata_path": str(metadata_path),
+                "resume_skills": resume_skills,
+                "resume_text": resume_text,
+            },
+            base_dir=BASE_DIR,
+        )
+
         os.remove(file_path)
 
         return {
+            "session_id": session_id,
             "filename": file.filename,
             "total_pages": len(documents),
             "total_chunks": len(chunked_documents),
             "vector_store_created": True,
-            "faiss_index_location": "resume_faiss_index/"
+            "faiss_index_location": str(resume_index_path),
+            "skill_insights": analyze_candidate_fit(resume_text, jd_text),
         }
     except Exception as e:
         return {
@@ -103,37 +119,43 @@ async def upload_pdf(file: UploadFile = File(...)):
         
         
 @app.post("/upload-jd")
-
 def upload_jd(request: JDRequest):
-    
     try:
-        
-        documents=[
-            Document(
-                page_content=request.job_description
-            )
-        ]
-        
-        chunked_documents=split_documents(documents)
-        
-       # print("\n========== JD CHUNKS ==========\n")
+        session_id = request.session_id or str(uuid4())
+        resume_index_path, jd_index_path, metadata_path = get_session_paths(session_id, base_dir=BASE_DIR)
+        session_dir = jd_index_path.parent
+        session_dir.mkdir(parents=True, exist_ok=True)
 
-        #for i, chunk in enumerate(chunked_documents):
+        documents = [Document(page_content=request.job_description)]
+        chunked_documents = split_documents(documents, document_type="jd")
+        jd_skills = extract_skills(request.job_description)
+        existing_metadata = read_metadata(session_id, base_dir=BASE_DIR)
+        resume_skills = existing_metadata.get("resume_skills", [])
+        resume_text = existing_metadata.get("resume_text", "")
 
-          #  print(f"\n------ CHUNK {i+1} ------")
-           # print(f"Length: {len(chunk.page_content)}")
-            #print(chunk.page_content)
-
-        #print("\n===============================\n")
-        
         create_vector_store(
             chunked_documents,
-            "jd_faiss_index"
+            str(jd_index_path)
         )
-        
-        return{
-            "message":"Job Description Uploaded",
-            "total_chunks":len(chunked_documents)
+
+        write_metadata(
+            session_id,
+            {
+                "session_id": session_id,
+                "jd_index_path": str(jd_index_path),
+                "resume_index_path": str(resume_index_path),
+                "metadata_path": str(metadata_path),
+                "jd_skills": jd_skills,
+                "jd_text": request.job_description,
+            },
+            base_dir=BASE_DIR,
+        )
+
+        return {
+            "session_id": session_id,
+            "message": "Job Description Uploaded",
+            "total_chunks": len(chunked_documents),
+            "skill_insights": analyze_candidate_fit(resume_text, request.job_description),
         }
     except Exception as e:
             return {
@@ -143,10 +165,11 @@ def upload_jd(request: JDRequest):
 @app.post("/search")
 def search_documents(request: SearchRequest):
     try:
-        results = retrieve_documents(
-            request.query,
-            "resume_faiss_index"
-        )
+        if not request.session_id:
+            return {"error": "session_id is required"}
+
+        resume_index_path, _, _ = get_session_paths(request.session_id, base_dir=BASE_DIR)
+        results = retrieve_documents(request.query, str(resume_index_path))
 
         return {
             "query": request.query,
@@ -167,11 +190,11 @@ def search_documents(request: SearchRequest):
         
 @app.post("/search-jd")
 def search_jd(request: SearchRequest):
+    if not request.session_id:
+        return {"error": "session_id is required"}
 
-    results = retrieve_documents(
-        request.query,
-        "jd_faiss_index"
-    )
+    _, jd_index_path, _ = get_session_paths(request.session_id, base_dir=BASE_DIR)
+    results = retrieve_documents(request.query, str(jd_index_path))
 
     return {
         "results": [
@@ -187,14 +210,14 @@ def search_jd(request: SearchRequest):
 def ask_question(request: SearchRequest):
 
     try:
+        if not request.session_id:
+            return {"error": "session_id is required"}
 
-        answer = generate_answer(
-            request.query
-        )
+        result = generate_answer(request.query, request.session_id)
 
         return {
             "question": request.query,
-            "answer": answer
+            **result,
         }
         
     except Exception as e:
