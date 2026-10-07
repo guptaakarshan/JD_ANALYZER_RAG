@@ -1,0 +1,57 @@
+{
+  "candidate_fit": {
+    "overall_score": 36,
+    "match_label": "Needs improvement",
+    "summary": "Needs improvement (36%). Significant gaps exist between your current profile and the position's requirements.",
+    "breakdown": {
+      "required_skills": 0,
+      "preferred_skills": 0,
+      "experience": 90,
+      "projects": 50,
+      "education": 80
+    },
+    "skills": {
+      "matched": [],
+      "missing_required": [
+        "Microsoft Excel",
+        "PowerPoint"
+      ],
+      "missing_preferred": [
+        "Google Analytics",
+        "SEO",
+        "SEM",
+        "Social media marketing platforms",
+        "Canva",
+        "Adobe Creative Suite",
+        "CRM platforms",
+        "Email marketing tools"
+      ],
+      "partial": []
+    },
+    "strengths": [
+      "Relevant hands-on engineering background as Full Stack Developer Intern at Code X Tech.",
+      "Practical implementation experience demonstrated in project \"Multi-Document RAG JD Analyzer\"."
+    ],
+    "gaps": [
+      "Missing required skills: Microsoft Excel, PowerPoint.",
+      "Lacks preferred skills: Google Analytics, SEO, SEM."
+    ],
+    "relevant_projects": [
+      {
+        "name": "Multi-Document RAG JD Analyzer",
+        "relevance": 50,
+        "reason": "Demonstrates practical implementation of relevant engineering concepts aligned with role requirements."
+      },
+      {
+        "name": "Collab-Docs \u2014 Real-Time Collaborative Document Editor",
+        "relevance": 50,
+        "reason": "Demonstrates practical implementation of relevant engineering concepts aligned with role requirements."
+      }
+    ],
+    "recommendations": [
+      "Focus on gaining practical hands-on experience in Microsoft Excel, PowerPoint.",
+      "Explore preferred technologies such as Google Analytics, SEO to strengthen your profile.",
+      "Highlight production metrics, deployment links, and testing coverage in your project descriptions."
+    ]
+  }
+}
