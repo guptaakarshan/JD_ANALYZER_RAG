@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { ArrowRight, HelpCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const SUGGESTIONS = [
   'What skills am I missing?',
+  'Why is my match score low?',
   'Does my experience fit this role?',
   'How can I improve my resume?',
   'What are my strongest qualifications?',
@@ -13,22 +14,28 @@ export default function AskAISection({ onAsk, isLoading, disabled }) {
   const [question, setQuestion] = useState('');
 
   const submit = (value) => {
-    if (!value.trim()) { toast.error('Write a question first.'); return; }
+    if (!value.trim()) {
+      toast.error('Write a question first.');
+      return;
+    }
     onAsk(value.trim());
     setQuestion('');
   };
 
-  const handleSubmit = (e) => { e.preventDefault(); submit(question); };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    submit(question);
+  };
 
   return (
-    <section className="ask-section animate-fade-up" style={{ animationDelay: '0.15s' }}>
+    <section className="ask-section compact-ask animate-fade-up">
       <div className="ask-header">
         <div className="ask-icon-wrap">
-          <Sparkles size={18} />
+          <HelpCircle size={18} />
         </div>
         <div>
-          <p className="ask-title">Ask AI</p>
-          <p className="ask-subtitle">Get personalized insights about your resume and this role.</p>
+          <p className="ask-title">HAVE QUESTIONS ABOUT YOUR MATCH?</p>
+          <p className="ask-subtitle">Ask anything about your resume or this role.</p>
         </div>
       </div>
 
@@ -39,24 +46,25 @@ export default function AskAISection({ onAsk, isLoading, disabled }) {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             disabled={disabled || isLoading}
-            placeholder="e.g. What skills am I missing for this role?"
-            aria-label="Question about your match"
+            placeholder="Ask something about your match..."
+            aria-label="Ask something about your match"
           />
           <button type="submit" className="ask-submit" disabled={disabled || isLoading}>
             {isLoading ? (
               <span className="spinner" />
             ) : (
-              <>Ask AI <ArrowRight size={15} /></>
+              <>Ask <ArrowRight size={14} /></>
             )}
           </button>
         </div>
       </form>
 
       <div className="suggestions-wrap">
-        <span className="suggestion-label">Try:</span>
+        <span className="suggestion-label">Suggested:</span>
         {SUGGESTIONS.map((s) => (
           <button
             key={s}
+            type="button"
             className="suggestion-chip"
             onClick={() => submit(s)}
             disabled={disabled || isLoading}

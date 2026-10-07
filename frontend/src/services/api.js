@@ -77,3 +77,18 @@ export async function askQuestion(query, sessionId) {
   if (data?.error) throw new Error(data.error);
   return data; // { question, answer }
 }
+
+/**
+ * POST /analyze-match
+ * Body: { session_id: string }
+ * Returns: Structured Candidate-Fit Analysis
+ */
+export async function analyzeMatch(sessionId) {
+  const { data } = await api.post('/analyze-match', {
+    session_id: sessionId,
+  });
+
+  if (data?.error) throw new Error(data.error);
+  return data;
+}
+

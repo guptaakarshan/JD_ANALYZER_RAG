@@ -10,6 +10,7 @@ from rag.vectorstore import create_vector_store
 from rag.retriever import retrieve_documents
 from rag.rag_chain import generate_answer
 from rag.session_store import get_session_paths
+from rag.candidate_scorer import calculate_candidate_fit
 from pydantic import BaseModel
 from langchain_core.documents import Document
 
@@ -208,3 +209,18 @@ def ask_question(request: SearchRequest):
         
     except Exception as e:
         return {"error": str(e)}
+
+
+class AnalyzeMatchRequest(BaseModel):
+    session_id: str
+
+
+@app.post("/analyze-match")
+def analyze_match(request: AnalyzeMatchRequest):
+    try:
+        if not request.session_id:
+            return {"error": "session_id is required"}
+
+        return calculate_candidate_fit(request.session_id)
+    except Exception as e:
+        return {"error": str(e)}

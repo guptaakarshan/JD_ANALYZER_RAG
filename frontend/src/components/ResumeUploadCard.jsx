@@ -35,11 +35,11 @@ export default function ResumeUploadCard({ onUploadSuccess, uploadedFileName, se
   const handleUpload = async () => {
     if (!selectedFile) return;
     setIsUploading(true);
-    const tid = toast.loading('Indexing resume…');
+    const tid = toast.loading('Uploading resume…');
     try {
       const result = await uploadPdf(selectedFile, sessionId);
       toast.dismiss(tid);
-      toast.success('Resume ready!');
+      toast.success('Resume uploaded successfully!');
       onUploadSuccess({ filename: selectedFile.name, sessionId: result.session_id });
       setSelectedFile(null);
     } catch (err) {
@@ -83,7 +83,7 @@ export default function ResumeUploadCard({ onUploadSuccess, uploadedFileName, se
           </div>
           <div className="file-chip-body">
             <div className="file-chip-name">{uploadedFileName}</div>
-            <div className="file-chip-meta">Indexed and ready</div>
+            <div className="file-chip-meta">Uploaded and ready</div>
           </div>
           <button className="file-chip-remove" onClick={() => onUploadSuccess(null)} aria-label="Clear">
             <X size={15} />

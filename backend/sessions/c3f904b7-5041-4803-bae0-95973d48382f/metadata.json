@@ -1,0 +1,72 @@
+{
+  "candidate_fit": {
+    "overall_score": 82,
+    "match_label": "Strong match",
+    "summary": "Strong match (82%). Your resume closely matches the core requirements and technical stack for this position.",
+    "breakdown": {
+      "required_skills": 95,
+      "preferred_skills": 42,
+      "experience": 100,
+      "projects": 50,
+      "education": 100
+    },
+    "skills": {
+      "matched": [
+        "JavaScript",
+        "React",
+        "Node.js",
+        "Express.js",
+        "MongoDB",
+        "MySQL",
+        "Git",
+        "GitHub",
+        "Data Structures & Algorithms",
+        "Python",
+        "AWS",
+        "EC2",
+        "S3",
+        "Lambda"
+      ],
+      "missing_required": [],
+      "missing_preferred": [
+        "TypeScript",
+        "Java",
+        "Docker",
+        "CI/CD",
+        "Redis",
+        "Jest",
+        "Cypress"
+      ],
+      "partial": [
+        "REST APIs"
+      ]
+    },
+    "strengths": [
+      "Strong demonstrated proficiency across core role technologies: JavaScript, React, Node.js, Express.js.",
+      "Relevant hands-on engineering background as Full Stack Developer Intern at Code X Tech.",
+      "Practical implementation experience demonstrated in project \"Multi-Document RAG JD Analyzer\".",
+      "Relevant educational background with a B.Tech in Computer Science and Engineering."
+    ],
+    "gaps": [
+      "Lacks preferred skills: TypeScript, Java, Docker.",
+      "Partial or indirect coverage for: REST APIs."
+    ],
+    "relevant_projects": [
+      {
+        "name": "Multi-Document RAG JD Analyzer",
+        "relevance": 50,
+        "reason": "Demonstrates practical implementation of relevant engineering concepts aligned with role requirements."
+      },
+      {
+        "name": "Collab-Docs \u2014 Real-Time Collaborative Document Editor",
+        "relevance": 50,
+        "reason": "Demonstrates practical implementation of relevant engineering concepts aligned with role requirements."
+      }
+    ],
+    "recommendations": [
+      "Explore preferred technologies such as TypeScript, Java to strengthen your profile.",
+      "Highlight production metrics, deployment links, and testing coverage in your project descriptions.",
+      "Tailor bullet points to emphasize impact and quantitative achievements."
+    ]
+  }
+}

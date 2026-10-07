@@ -19,11 +19,11 @@ export default function JobDescriptionCard({ onSaveSuccess, isSaved, sessionId }
       return;
     }
     setIsSaving(true);
-    const tid = toast.loading('Indexing job description…');
+    const tid = toast.loading('Saving job description…');
     try {
       const result = await uploadJd(jdText, sessionId);
       toast.dismiss(tid);
-      toast.success('Job description ready!');
+      toast.success('Job description saved!');
       onSaveSuccess(result.session_id);
     } catch (err) {
       toast.dismiss(tid);
@@ -37,7 +37,7 @@ export default function JobDescriptionCard({ onSaveSuccess, isSaved, sessionId }
     <section className="card animate-fade-up" style={{ animationDelay: '0.1s' }}>
       <div className="card-label" style={{ justifyContent: 'space-between' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span className="card-label-dot" style={{ background: 'var(--accent-2)' }} />
+          <span className="card-label-dot" style={{ background: 'var(--emerald)' }} />
           Step 2 — Job Description
         </span>
         {isSaved && (
