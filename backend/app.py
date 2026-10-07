@@ -7,9 +7,9 @@ from uuid import uuid4
 from rag.extractor import load_pdf_documents
 from rag.chunker import split_documents
 from rag.vectorstore import create_vector_store
-from rag.retriever import retrieve_documents
+from rag.retriever import retrieve_documents, load_vector_store
 from rag.rag_chain import generate_answer
-from rag.session_store import get_session_paths
+from rag.session_store import get_session_paths, index_exists
 from rag.candidate_scorer import calculate_candidate_fit
 from pydantic import BaseModel
 from langchain_core.documents import Document
@@ -223,4 +223,23 @@ def analyze_match(request: AnalyzeMatchRequest):
 
         return calculate_candidate_fit(request.session_id)
     except Exception as e:
-        return {"error": str(e)}
+        return {"error": str(e)}
+
+
+@app.get("/sessions/{session_id}/chunks")
+def get_chunks(session_id: str):
+    resume_path, jd_path, _ = get_session_paths(session_id)
+    
+    def extract_chunks(index_path):
+        if not index_exists(index_path):
+            return []
+        vs = load_vector_store(str(index_path))
+        return [
+            {"content": doc.page_content, "metadata": doc.metadata}
+            for doc in vs.docstore._dict.values()
+        ]
+        
+    return {
+        "resume_chunks": extract_chunks(resume_path),
+        "jd_chunks": extract_chunks(jd_path),
+    }
